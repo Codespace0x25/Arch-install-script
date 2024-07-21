@@ -91,8 +91,7 @@ limine-install ${DRIVE}
 
 # Install essential packages
 echo "Installing essential packages..."
-pacman -S --noconfirm base-devel networkmanager vim sudo git xorg-server xorg-xinit picom
-
+pacman -S --noconfirm base-devel networkmanager emacs nvim sudo git xorg-server xorg-xinit picom kitty firefox
 # Enable NetworkManager
 systemctl enable NetworkManager
 
