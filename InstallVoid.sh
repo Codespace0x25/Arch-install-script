@@ -95,13 +95,13 @@ pacman -S --noconfirm base-devel networkmanager emacs nvim sudo git xorg-server 
 # Enable NetworkManager
 systemctl enable NetworkManager
 
-# Install init system
-pacman -S --noconfirm openrc openrc-arch-services
-
-# Change the init system
-ln -sf /etc/init.d/NetworkManager /etc/runlevels/default/NetworkManager
-rc-update add NetworkManager default
-
+# Loginscreen
+read -p "would you like a login manager or just a tty login\n if you go with the tty opshon you will use startx for startung dwm.\n(y,N)" login
+login=${login:-N}
+if [[ $login == [Yy] ]]; then
+pacman -S --noconfirm sddm
+systemctl enable sddm
+fi
 # Check for NVIDIA GPU and install drivers if present
 if lspci | grep -E "NVIDIA|GeForce"; then
     echo "NVIDIA GPU detected, installing drivers..."
