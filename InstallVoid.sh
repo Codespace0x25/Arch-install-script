@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # Check if the drive argument is provided
 if [ -z "$1" ]; then
@@ -46,10 +47,10 @@ locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 # Network configuration
-echo "archlinux" > /etc/hostname
+echo "voidspace" > /etc/hostname
 echo "127.0.0.1 localhost" >> /etc/hosts
 echo "::1       localhost" >> /etc/hosts
-echo "127.0.1.1 archlinux.localdomain archlinux" >> /etc/hosts
+echo "127.0.1.1 voidspace.localdomain voidspace" >> /etc/hosts
 
 # Set root password
 echo "Setting root password..."
@@ -64,11 +65,29 @@ echo "Please enter password for \$username:"
 passwd \$username
 echo "\$username ALL=(ALL) ALL" >> /etc/sudoers
 
-# Install and configure bootloader
-echo "Installing bootloader..."
-pacman -S --noconfirm grub
-grub-install --target=i386-pc $DRIVE
-grub-mkconfig -o /boot/grub/grub.cfg
+# Install and configure limine bootloader
+echo "Installing limine bootloader..."
+pacman -S --noconfirm limine
+cp /usr/share/limine/limine.sys /boot/
+cp /usr/share/limine/limine-cd.bin /boot/
+cp /usr/share/limine/limine-eltorito-efi.bin /boot/
+cp /usr/share/limine/limine-efi.bin /boot/
+
+# Configure limine
+cat <<LIMINECFG > /boot/limine.cfg
+TIMEOUT=5
+INTERFACE=text
+GRAPHICS=yes
+
+:Arch Linux
+    COMMENT=Boot into Arch Linux
+    PROTOCOL=linux
+    KERNEL_PATH=/vmlinuz-linux
+    MODULE_PATH=/initramfs-linux.img
+    CMDLINE=root=$(blkid -s UUID -o value ${DRIVE}1) rw
+LIMINECFG
+
+limine-install ${DRIVE}
 
 # Install essential packages
 echo "Installing essential packages..."
@@ -94,8 +113,7 @@ fi
 EOF
 
 # Prompt for WiFi setup after chroot and init system change
-echo "Do you want to set up WiFi? (Y/n): "
-read setup_wifi
+read -p "Do you want to set up WiFi? (Y/n): " setup_wifi
 setup_wifi=${setup_wifi:-Y}
 
 if [[ $setup_wifi == [Yy] ]]; then
