@@ -135,7 +135,7 @@ yay -S --noconfirm rofi
 # Clone and build dwm
 git clone https://github.com/Codespace0x25/dwm.git
 cd dwm
-make clean install
+make clean install setupDW
 
 # Set up .xinitrc for dwm
 echo "exec dwm" > /home/\$username/.xinitrc
